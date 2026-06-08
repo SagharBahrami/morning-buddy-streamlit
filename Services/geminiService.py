@@ -8,6 +8,7 @@ from datetime import datetime
 
 load_dotenv()
 class GeminiService:
+        
     
     def __init__(self):
         
@@ -73,32 +74,35 @@ class GeminiService:
             
         return None
     
+    def extract_weather_info(self, weather_data: dict):
+        return {
+        "city": weather_data["name"],
+        "country": weather_data["sys"]["country"],
+        "temperature": weather_data["main"]["temp"],
+        "condition": weather_data["weather"][0]["description"],
+        "humidity": weather_data["main"]["humidity"],
+        "wind_speed": weather_data["wind"]["speed"],
+        "sunrise": datetime.fromtimestamp(weather_data["sys"]["sunrise"]).strftime("%I:%M %p"),
+        "sunset": datetime.fromtimestamp(weather_data["sys"]["sunset"]).strftime("%I:%M %p"),
+    }
 
     def get_weather_summary(self, weather_data: dict):
                 
-        city = weather_data["name"]
-        country = weather_data["sys"]["country"]
-        temperature = weather_data["main"]["temp"]
-        condition = weather_data["weather"][0]["description"]
-        humidity = weather_data["main"]["humidity"]
-        wind_speed = weather_data["wind"]["speed"]
-        sunrise = datetime.fromtimestamp(weather_data["sys"]["sunrise"]).strftime("%I:%M %p")
-        sunset = datetime.fromtimestamp(weather_data["sys"]["sunset"]).strftime("%I:%M %p")
+        weather_info=self.extract_weather_info(weather_data)
         
         prompt = f"""
         Create a friendly weather summary using this information:
 
-        City: {city}
-        Country: {country}
-        Temperature: {temperature}
-        Condition: {condition}
-        Humidity: {humidity}
-        Wind speed: {wind_speed}
-        Sunrise: {sunrise}
-        Sunset: {sunset}
-
+        City: {weather_info["city"]}
+        Country: {weather_info["country"]}
+        Temperature: {weather_info["temperature"]}
+        Condition: {weather_info["condition"]}
+        Humidity: {weather_info["humidity"]}
+        Wind speed: {weather_info["wind_speed"]}
+        Sunrise: {weather_info["sunrise"]}
+        Sunset: {weather_info["sunset"]}
         Requirements:
-        - Start with this title format: Weather Info: Here's your weather update for {city}, {country}!
+        - Start with this title format: Weather Info: Here's your weather update for {weather_info["city"]}, {weather_info["country"]}!
         - Mention temperature, condition, humidity, and wind speed
         - Mention sunrise and sunset
         - Add one practical suggestion based on the weather
@@ -135,5 +139,48 @@ class GeminiService:
 
         return response.text.strip()
     
-    def create_smart_plan(self, city: str):
-        return
+    def create_smart_plan(self, weather_data: dict):
+        
+        weather_info=self.extract_weather_info(weather_data)
+        current_date=datetime.now().strftime("%Y-%m-%d")
+        title=f"✨ Your Personalized Day Plan for {weather_info['city']}({current_date})"
+        
+        
+        prompt = f"""
+        You are a smart daily planner. Create a one-day plan for the user based on the current weather.
+
+        Weather information:
+        City: {weather_info['city']}
+        Country: {weather_info['country']}
+        Temperature: {weather_info['temperature']}
+        Condition: {weather_info['condition']}
+        Humidity: {weather_info['humidity']}
+        Wind speed: {weather_info['wind_speed']}
+        Sunrise: {weather_info['sunrise']}
+        Sunset: {weather_info['sunset']}
+
+        Format the response in Markdown.
+
+        Requirements:
+        - Use this exact title: # {title}
+        - Create exactly 4 sections including appropriate emoji with following headers:
+        ### Morning Plan (9:00 AM - 12:00 PM)
+        ### Lunch Plan (12:00 PM - 1:30 PM)
+        ### Afternoon Plan (1:30 PM - 5:30 PM)
+        ### Evening Plan (5:30 PM - 9:00 PM)
+        
+        - Suggest tourist attractions or activity types that fit the weather
+        - Suggest whether lunch/dinner should be indoor or outdoor based on the weather
+        - Suggest traditional or international food options
+        - For events, concerts, or ticketed activities, do not invent links but search for any event or show and provide real link to get the ticket
+        - Keep the plan practical, friendly, and easy to read
+        - End with ✅ following with one short sentence about the day plan and wish them a nice and fun day
+        """
+            
+        response=self.client.models.generate_content(
+            model=self.text_model,
+            contents=prompt,
+            
+        )
+        return response.text.strip()
+    

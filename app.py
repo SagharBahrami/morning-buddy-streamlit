@@ -71,11 +71,12 @@ elif page == "Get Weather of your City":
 
     if st.button("Fetch Information"):
         if city:
-            weather_data = weather_service.get_current_weather(city)
-            weather_summary = gemini_service.get_weather_summary(weather_data)
+            with st.spinner("Fetching weather information..."):
+                st.session_state["weather_data"] = weather_service.get_current_weather(city)
+                weather_summary = gemini_service.get_weather_summary(st.session_state["weather_data"])
 
-            st.markdown(f"## {weather_summary}")
-            st.success("Weather fetched successfully ✅")
+                st.markdown(f"## {weather_summary}")
+                st.success("Weather fetched successfully ✅")
         else:
             st.warning("Please enter a city name.")
 
@@ -117,13 +118,6 @@ elif page == "News by Interest":
 # Smart Planner Page
 # -----------------------------
 elif page == "Smart Planner":
-    st.title("Smart Planner")
-
-    goal = st.text_area("What do you want to plan today?")
-
-    if st.button("Create Plan"):
-        if goal:
-            plan = gemini_service.create_smart_plan(goal)
-            st.write(plan)
-        else:
-            st.warning("Please enter your goal or task.")
+    
+    plan = gemini_service.create_smart_plan(st.session_state["weather_data"])
+    st.write(plan)
