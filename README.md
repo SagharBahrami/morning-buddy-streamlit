@@ -48,7 +48,7 @@ morning-buddy-streamlit/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/morning-buddy-streamlit.git
+git clone https://github.com/SagharBahrami/morning-buddy-streamlit.git
 cd morning-buddy-streamlit
 ```
 
@@ -132,9 +132,7 @@ The app has a sidebar that allows users to choose what they want to do:
 
 In the future, I would like to add:
 
-- User-selected image styles
 - Weather unit selection, such as Celsius or Fahrenheit
-- Weather-aware smart planning
 - News category filters
 - Saved favorite news topics
 - Deployment on Streamlit Community Cloud
