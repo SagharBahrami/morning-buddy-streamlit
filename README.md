@@ -13,7 +13,8 @@ This project uses Google Gemini to generate a daily motivational thought, create
 - Search news articles by user interest or topic
 - Display 5 related news articles in columns
 - Generate a quick summary for each news article
-- Provide a smart planner section for daily planning
+- Create a weather-based smart daily plan for a selected city
+- Use a sidebar navigation menu for different app sections
 
 ## Tech Stack
 
@@ -31,13 +32,21 @@ I used the following tools and APIs:
 
 ```text
 morning-buddy-streamlit/
+├── .git/
+├── .venv/
 ├── app.py
 ├── README.md
 ├── requirements.txt
 ├── .env
 ├── .gitignore
+├── screenshots/
+│   ├── home.png
+│   ├── weather.png
+│   ├── news.png
+│   └── planner.png
 └── Services/
     ├── __init__.py
+    ├── __pycache__/
     ├── geminiService.py
     ├── weatherService.py
     └── newsService.py

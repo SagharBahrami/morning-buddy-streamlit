@@ -119,5 +119,10 @@ elif page == "News by Interest":
 # -----------------------------
 elif page == "Smart Planner":
     
-    plan = gemini_service.create_smart_plan(st.session_state["weather_data"])
-    st.write(plan)
+    if "weather_data" not in st.session_state:
+        st.warning("Please check the weather first before creating a smart plan.")
+        st.info("Go to **Get Weather of your City**, enter a city, and click **Fetch Information**.")
+    else:
+    
+        plan = gemini_service.create_smart_plan(st.session_state["weather_data"])
+        st.write(plan)
