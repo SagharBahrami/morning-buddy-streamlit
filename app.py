@@ -2,8 +2,8 @@ import streamlit as st
 from Services.weatherService import WeatherService
 from Services.geminiService import GeminiService
 from Services.newsService import NewsService
-
-
+from datetime import date
+from Services.smartPlannerService import SmartPlanner
 st.set_page_config(
     page_title="Your Morning Buddy",
     page_icon="☀️",
@@ -13,10 +13,10 @@ st.set_page_config(
 
 @st.cache_resource
 def load_services():
-    return GeminiService(), WeatherService(), NewsService()
+    return SmartPlanner(), GeminiService(), WeatherService(), NewsService()
 
 
-gemini_service, weather_service, news_service = load_services()
+smart_planner_service, gemini_service, weather_service, news_service = load_services()
 
 
 # -----------------------------
@@ -72,8 +72,8 @@ elif page == "Get Weather of your City":
     if st.button("Fetch Information"):
         if city:
             with st.spinner("Fetching weather information..."):
-                st.session_state["weather_data"] = weather_service.get_current_weather(city)
-                weather_summary = gemini_service.get_weather_summary(st.session_state["weather_data"])
+                weather_data = weather_service.get_current_weather(city)
+                weather_summary = gemini_service.get_weather_summary(weather_data)
 
                 st.markdown(f"## {weather_summary}")
                 st.success("Weather fetched successfully ✅")
@@ -102,7 +102,7 @@ elif page == "News by Interest":
 
         for index, article in enumerate(st.session_state["articles"][:5]):
             with columns[index]:
-                st.subheader(article.get("title", "No title"))
+                st.subheader(article.get("title", "No title"))  
                 st.write(f"Source: {article.get('source', 'Unknown')}")
                 st.write(article.get("description", "No description available."))
                 st.markdown(f"[Read full article]({article.get('url')})")
@@ -119,10 +119,18 @@ elif page == "News by Interest":
 # -----------------------------
 elif page == "Smart Planner":
     
-    if "weather_data" not in st.session_state:
-        st.warning("Please check the weather first before creating a smart plan.")
-        st.info("Go to **Get Weather of your City**, enter a city, and click **Fetch Information**.")
-    else:
+    selected_city = st.text_input("Enter your city name:")
+    selected_date = st.date_input(
+    "Choose a date for your smart plan:",
+    value=date.today()
+    )    
     
-        plan = gemini_service.create_smart_plan(st.session_state["weather_data"])
-        st.write(plan)
+    if st.button("Fetch my Plan"):
+        if not selected_date or not selected_city:
+            st.warning("Please enter your city and choose date before creating a smart plan.")
+        else:
+            with st.spinner("Wait to plan your day..."):
+                events=smart_planner_service.smart_planner(selected_city, selected_date)
+                weather_data=weather_service.get_current_weather(selected_city)
+                plan = gemini_service.create_smart_plan(events, weather_data, selected_date)
+                st.write(plan)

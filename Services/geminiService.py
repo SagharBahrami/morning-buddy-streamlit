@@ -3,7 +3,7 @@ import os
 from google import genai
 from google.genai import types
 from dotenv import load_dotenv
-from datetime import datetime
+from datetime import datetime, date
 
 
 load_dotenv()
@@ -74,33 +74,22 @@ class GeminiService:
             
         return None
     
-    def extract_weather_info(self, weather_data: dict):
-        return {
-        "city": weather_data["name"],
-        "country": weather_data["sys"]["country"],
-        "temperature": weather_data["main"]["temp"],
-        "condition": weather_data["weather"][0]["description"],
-        "humidity": weather_data["main"]["humidity"],
-        "wind_speed": weather_data["wind"]["speed"],
-        "sunrise": datetime.fromtimestamp(weather_data["sys"]["sunrise"]).strftime("%I:%M %p"),
-        "sunset": datetime.fromtimestamp(weather_data["sys"]["sunset"]).strftime("%I:%M %p"),
-    }
 
     def get_weather_summary(self, weather_data: dict):
                 
-        weather_info=self.extract_weather_info(weather_data)
+       
         
         prompt = f"""
         Create a friendly weather summary using this information:
 
-        City: {weather_info["city"]}
-        Country: {weather_info["country"]}
-        Temperature: {weather_info["temperature"]}
-        Condition: {weather_info["condition"]}
-        Humidity: {weather_info["humidity"]}
-        Wind speed: {weather_info["wind_speed"]}
-        Sunrise: {weather_info["sunrise"]}
-        Sunset: {weather_info["sunset"]}
+        City: {weather_data["city"]}
+        Country: {weather_data["country"]}
+        Temperature: {weather_data["temperature"]}
+        Condition: {weather_data["condition"]}
+        Humidity: {weather_data["humidity"]}
+        Wind speed: {weather_data["wind_speed"]}
+        Sunrise: {weather_data["sunrise"]}
+        Sunset: {weather_data["sunset"]}
         Requirements:
         - Start with this title format: Weather Info: Here's your weather update for {weather_info["city"]}, {weather_info["country"]}!
         - Mention temperature, condition, humidity, and wind speed
@@ -139,25 +128,29 @@ class GeminiService:
 
         return response.text.strip()
     
-    def create_smart_plan(self, weather_data: dict):
+    def create_smart_plan(self, event_data: dict, weather_data: dict, selected_date: date):
         
-        weather_info=self.extract_weather_info(weather_data)
-        current_date=datetime.now().strftime("%Y-%m-%d")
-        title=f"✨ Your Personalized Day Plan for {weather_info['city']}({current_date})"
+        
+        title=f"✨ Your Personalized Day Plan for {weather_data['city']}({selected_date})"
         
         
         prompt = f"""
         You are a smart daily planner. Create a one-day plan for the user based on the current weather.
 
         Weather information:
-        City: {weather_info['city']}
-        Country: {weather_info['country']}
-        Temperature: {weather_info['temperature']}
-        Condition: {weather_info['condition']}
-        Humidity: {weather_info['humidity']}
-        Wind speed: {weather_info['wind_speed']}
-        Sunrise: {weather_info['sunrise']}
-        Sunset: {weather_info['sunset']}
+        City: {weather_data['city']}
+        Country: {weather_data['country']}
+        Temperature: {weather_data['temperature']}
+        Condition: {weather_data['condition']}
+        Humidity: {weather_data['humidity']}
+        Wind speed: {weather_data['wind_speed']}
+        Sunrise: {weather_data['sunrise']}
+        Sunset: {weather_data['sunset']}
+        
+        Event information:
+        
+        {event_data}
+        
 
         Format the response in Markdown.
 
@@ -169,6 +162,7 @@ class GeminiService:
         ### Afternoon Plan (1:30 PM - 5:30 PM)
         ### Evening Plan (5:30 PM - 9:00 PM)
         
+        - find the best events in {event_data} for {selected_date}
         - Suggest tourist attractions or activity types that fit the weather
         - Suggest whether lunch/dinner should be indoor or outdoor based on the weather
         - Suggest traditional or international food options

@@ -1,6 +1,7 @@
 import os
 import requests
 from dotenv import load_dotenv
+from datetime import datetime
 
 load_dotenv()
 
@@ -25,4 +26,16 @@ class WeatherService:
         response=requests.get(self.base_url, params=params)
         response.raise_for_status()
         
-        return response.json()
+        data=response.json()
+            
+        cleaned_data={
+        "city": data["name"],
+        "country": data["sys"]["country"],
+        "temperature": data["main"]["temp"],
+        "condition": data["weather"][0]["description"],
+        "humidity": data["main"]["humidity"],
+        "wind_speed": data["wind"]["speed"],
+        "sunrise": datetime.fromtimestamp(data["sys"]["sunrise"]).strftime("%I:%M %p"),
+        "sunset": datetime.fromtimestamp(data["sys"]["sunset"]).strftime("%I:%M %p")
+        }
+        return cleaned_data
