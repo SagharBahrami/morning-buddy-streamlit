@@ -91,7 +91,7 @@ class GeminiService:
         Sunrise: {weather_data["sunrise"]}
         Sunset: {weather_data["sunset"]}
         Requirements:
-        - Start with this title format: Weather Info: Here's your weather update for {weather_info["city"]}, {weather_info["country"]}!
+        - Start with this title format: Weather Info: Here's your weather update for {weather_data["city"]}, {weather_data["country"]}!
         - Mention temperature, condition, humidity, and wind speed
         - Mention sunrise and sunset
         - Add one practical suggestion based on the weather
