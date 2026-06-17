@@ -106,6 +106,8 @@ class GeminiService:
         return response.text.strip()
     
     def get_news_summary(self, news_data: dict):
+
+
         
         prompt = f"""
         Create a short, helpful summary from this news article information:
