@@ -49,7 +49,8 @@ morning-buddy-streamlit/
     ├── __pycache__/
     ├── geminiService.py
     ├── weatherService.py
-    └── newsService.py
+    ├── newsService.py
+    └── smartPlannerService.py
 ```
 
 ## Setup
@@ -118,6 +119,7 @@ python -m streamlit run app.py
 | `GOOGLE_API_KEY` | API key used for Google Gemini |
 | `OPENWEATHER_API_KEY` | API key used for OpenWeather weather data |
 | `NEWS_API_KEY` | API key used for NewsAPI article search |
+| `SerpApi_API_KEY` | API key used for SerpApi local event search |
 
 ## How the App Works
 
@@ -126,14 +128,14 @@ The app has a sidebar that allows users to choose what they want to do:
 - **Home**: Generates a motivational thought and a related realistic image.
 - **Get Weather of your City**: Lets the user enter a city and receive a friendly weather update.
 - **News by Interest**: Lets the user enter a topic and view 5 related articles.
-- **Smart Planner**: Provides a section for planning daily tasks.
-
+- **Smart Planner**: Creates a weather-based daily plan and suggests local events or shows for a selected city and date, including available links for ticket purchases.
 ## Notes
 
 - I used separate service classes to keep the code cleaner:
   - `GeminiService` handles Gemini text and image generation.
   - `WeatherService` handles weather API requests.
   - `NewsService` handles news API requests.
+  - `SmartPlannerService` handles local event search using SerpApi.
 - News summaries are based on the title and description returned by NewsAPI, not the full article text.
 - Gemini image generation may sometimes return a temporary high-demand error. If that happens, the user can try again later.
 
